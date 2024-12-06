@@ -1,85 +1,112 @@
+from dataclasses import dataclass
+from typing import List, Set, Tuple, Dict, Optional
 from copy import deepcopy
-
-with open("day_06/data.txt") as f:
-    data = [list(line.strip()) for line in f]
-
-GUARD_ARROWS = ["^", ">", "v", "<"]
-possible_coordinates = {
-    (row, col)
-    for row in range(len(data))
-    for col in range(len(data[0]))
-    if data[row][col] == "."
-}
+import time
+from datetime import timedelta
 
 
-def find_arrow(grid):
-    for row in range(len(grid)):
-        for col in range(len(grid[0])):
-            if grid[row][col] in GUARD_ARROWS:
-                return grid[row][col], (row, col)
+@dataclass
+class Position:
+    row: int
+    col: int
+
+    def __add__(self, other: "Position") -> "Position":
+        return Position(self.row + other.row, self.col + other.col)
+
+    def is_valid(self, grid: List[List[str]]) -> bool:
+        return 0 <= self.row < len(grid) and 0 <= self.col < len(grid[0])
 
 
-def possible_escape(grid):
-    current_arrow, current_coords = find_arrow(grid)
-    visited = set()
+class Guard:
+    DIRECTIONS: Dict[str, Position] = {
+        "^": Position(-1, 0),
+        ">": Position(0, 1),
+        "v": Position(1, 0),
+        "<": Position(0, -1),
+    }
+
+    ROTATION = {"^": ">", ">": "v", "v": "<", "<": "^"}
+
+    def __init__(self, symbol: str, pos: Position):
+        self.symbol = symbol
+        self.pos = pos
+
+    def move(self, grid: List[List[str]]) -> Optional[bool]:
+        next_pos = self.pos + self.DIRECTIONS[self.symbol]
+
+        if not next_pos.is_valid(grid):
+            return True  # Escape possible
+
+        next_cell = grid[next_pos.row][next_pos.col]
+
+        if next_cell == ".":
+            grid[self.pos.row][self.pos.col] = "."
+            grid[next_pos.row][next_pos.col] = self.symbol
+            self.pos = next_pos
+        else:
+            self.symbol = self.ROTATION[self.symbol]
+            grid[self.pos.row][self.pos.col] = self.symbol
+
+        return False  # Escape not yet possible
+
+
+def find_guard(grid: List[List[str]]) -> Optional[Guard]:
+    for row_index, row in enumerate(grid):
+        for col_index, cell in enumerate(row):
+            if cell in Guard.DIRECTIONS:
+                return Guard(cell, Position(row_index, col_index))
+    return None
+
+
+def possible_escape(grid: List[List[str]]) -> Tuple[bool, Set[Tuple[int, int]]]:
+    guard = find_guard(grid)
+    if not guard:
+        return False, set()
+
+    visited: Set[Tuple[str, int, int]] = set()
 
     while True:
-        current_row, current_col = current_coords
+        current_state = (guard.symbol, guard.pos.row, guard.pos.col)
+        if current_state in visited:
+            return False, set()
+        visited.add(current_state)
 
-        current_information = (current_arrow, current_coords)  # Convert to tuple
-        if current_information in visited:
-            return False, visited
-        else:
-            visited.add(current_information)
-
-        if current_arrow == GUARD_ARROWS[0]:  # Up
-            if current_row - 1 < 0:  # Escape out of bounds
-                return True, visited
-            if grid[current_row - 1][current_col] == ".":
-                grid[current_row][current_col] = "."
-                grid[current_row - 1][current_col] = current_arrow
-                current_coords = (current_row - 1, current_col)
-            else:
-                current_arrow = GUARD_ARROWS[1]  # Turn right
-        elif current_arrow == GUARD_ARROWS[1]:  # Right
-            if current_col + 1 >= len(grid[0]):  # Escape out of bounds
-                return True, visited
-            if grid[current_row][current_col + 1] == ".":
-                grid[current_row][current_col] = "."
-                grid[current_row][current_col + 1] = current_arrow
-                current_coords = (current_row, current_col + 1)
-            else:
-                current_arrow = GUARD_ARROWS[2]  # Turn down
-        elif current_arrow == GUARD_ARROWS[2]:  # Down
-            if current_row + 1 >= len(grid):  # Escape out of bounds
-                return True, visited
-            if grid[current_row + 1][current_col] == ".":
-                grid[current_row][current_col] = "."
-                grid[current_row + 1][current_col] = current_arrow
-                current_coords = (current_row + 1, current_col)
-            else:
-                current_arrow = GUARD_ARROWS[3]  # Turn left
-        elif current_arrow == GUARD_ARROWS[3]:  # Left
-            if current_col - 1 < 0:  # Escape out of bounds
-                return True, visited
-            if grid[current_row][current_col - 1] == ".":
-                grid[current_row][current_col] = "."
-                grid[current_row][current_col - 1] = current_arrow
-                current_coords = (current_row, current_col - 1)
-            else:
-                current_arrow = GUARD_ARROWS[0]  # Turn up
+        escaped = guard.move(grid)
+        if escaped:
+            return True, visited
 
 
-# Count positions that cause infinite loops
-num_possible_positions = 0
+def main():
+    start_time = time.perf_counter()
 
-for coord in possible_coordinates:
-    mutated_grid = deepcopy(data)
-    mutated_grid[coord[0]][coord[1]] = "O"  # Place the block
+    with open("day_06/data.txt") as f:
+        data = [list(line.strip()) for line in f]
 
-    escape_possible, _ = possible_escape(mutated_grid)
+    possible_coordinates = [
+        (row, col)
+        for row in range(len(data))
+        for col in range(len(data[0]))
+        if data[row][col] == "."
+    ]
 
-    if not escape_possible:
-        num_possible_positions += 1
+    num_possible_positions = 0
 
-print("Number of positions causing an infinite loop:", num_possible_positions)
+    for coord in possible_coordinates:
+        grid_copy = deepcopy(data)
+        # Place obstacle only if it's not the guard's position
+        if grid_copy[coord[0]][coord[1]] not in Guard.DIRECTIONS:
+            grid_copy[coord[0]][coord[1]] = "O"
+            escape_possible, _ = possible_escape(grid_copy)
+
+            if not escape_possible:
+                num_possible_positions += 1
+
+    print(f"Number of positions causing an infinite loop: {num_possible_positions}")
+
+    end_time = time.perf_counter()
+    elapsed_time = timedelta(seconds=end_time - start_time)
+    print(f"Time taken: {elapsed_time}")
+
+
+if __name__ == "__main__":
+    main()
