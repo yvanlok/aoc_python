@@ -14,19 +14,22 @@ def create_advent_of_code_structure(base_path, year):
         day_dir = os.path.join(year_path, f"day_{day:02}")
         os.makedirs(day_dir, exist_ok=True)
 
-        # Create data.txt
+        # Create data.txt (only if it doesn't exist)
         data_path = os.path.join(day_dir, "data.txt")
-        open(data_path, "w").close()
+        if not os.path.exists(data_path):
+            open(data_path, "w").close()
 
-        # Create part1.py with template
+        # Create part1.py with template (only if it doesn't exist)
         part1_path = os.path.join(day_dir, "part1.py")
-        with open(part1_path, "w") as f:
-            f.write(template.format(year=year, day=day, part=1))
+        if not os.path.exists(part1_path):
+            with open(part1_path, "w") as f:
+                f.write(template.format(year=year, day=day, part=1))
 
-        # Create part2.py with template
+        # Create part2.py with template (only if it doesn't exist)
         part2_path = os.path.join(day_dir, "part2.py")
-        with open(part2_path, "w") as f:
-            f.write(template.format(year=year, day=day, part=2))
+        if not os.path.exists(part2_path):
+            with open(part2_path, "w") as f:
+                f.write(template.format(year=year, day=day, part=2))
 
     print(f"Advent of Code structure for {year} created in {year_path}")
     print(f"Created 12 days with boilerplate templates from base_file.py")

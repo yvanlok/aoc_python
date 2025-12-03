@@ -15,8 +15,9 @@ def solve(data):
     """Solve the puzzle."""
     lines = data.split("\n")
 
+    result = 0
+
     # TODO: Implement solution
-    result = None
 
     return result
 
@@ -28,8 +29,8 @@ def main():
     result = solve(data)
     elapsed = perf_counter() - start
 
-    print(f"Result: {{{{result}}}}")
-    print(f"Time: {{{{elapsed:.6f}}}} seconds")
+    print(f"Result: {{result}}")
+    print(f"Time: {{elapsed:.6f}} seconds")
 
 
 if __name__ == "__main__":
