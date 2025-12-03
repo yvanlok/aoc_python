@@ -1,5 +1,5 @@
 """
-Advent of Code 2025 - Day 3 - Part 2
+Advent of Code 2025 - Day 3 - Part 1
 """
 
 from time import perf_counter
@@ -15,8 +15,27 @@ def solve(data):
     """Solve the puzzle."""
     lines = data.split("\n")
 
-    # TODO: Implement solution
-    result = None
+    result = 0
+
+    for batteries in lines:
+        combination = []
+
+        start = 0
+
+        for remaining in range(12, 0, -1):
+            end = len(batteries) - remaining + 1
+
+            best_idx = start
+
+            for i in range(start, end):
+                if batteries[i] > batteries[best_idx]:
+                    best_idx = i
+
+            combination.append(batteries[best_idx])
+
+            start = best_idx + 1
+
+        result += int("".join(combination))
 
     return result
 

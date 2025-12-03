@@ -15,8 +15,17 @@ def solve(data):
     """Solve the puzzle."""
     lines = data.split("\n")
 
-    # TODO: Implement solution
-    result = None
+    result = 0
+
+    for batteries in lines:
+
+        # compute max value (exclude last element) and first index where it occurs
+        max_val = max(batteries[:-1])  # don't count last digit
+        first_idx = batteries.index(max_val)
+
+        optimal_combination = int(max_val + max(batteries[first_idx + 1 :]))
+
+        result += optimal_combination
 
     return result
 
