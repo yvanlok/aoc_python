@@ -13,10 +13,19 @@ def read_input(filename="data.txt"):
 
 def solve(data):
     """Solve the puzzle."""
-    lines = data.split("\n")
+    num_ranges = data.split(",")
+    result = 0
+    for num_range in num_ranges:
+        start, end = num_range.split("-")
 
-    # TODO: Implement solution
-    result = None
+        for num in range(int(start), int(end) + 1):
+            num = str(num)
+            half = len(num) // 2
+            if len(num) % 2 == 0:
+                first = num[:half]
+                second = num[half:]
+                if first == second:
+                    result += int(num)
 
     return result
 

@@ -1,8 +1,9 @@
 """
-Advent of Code 2025 - Day 2 - Part 2
+Advent of Code 2025 - Day 2 - Part 1
 """
 
 from time import perf_counter
+from textwrap import wrap
 
 
 def read_input(filename="data.txt"):
@@ -13,10 +14,23 @@ def read_input(filename="data.txt"):
 
 def solve(data):
     """Solve the puzzle."""
-    lines = data.split("\n")
+    num_ranges = data.split(",")
+    result = 0
+    for num_range in num_ranges:
+        start, end = num_range.split("-")
 
-    # TODO: Implement solution
-    result = None
+        for num in range(int(start), int(end) + 1):
+            num = str(num)
+
+            for repeats in range(2, len(num) + 1):
+
+                split_position = len(num) // repeats
+                if len(num) % repeats == 0:
+                    parts = wrap(num, split_position)
+                    # check all parts are equal:
+                    if len(set(parts)) == 1:
+                        result += int(num)
+                        break
 
     return result
 
