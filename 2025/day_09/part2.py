@@ -1,5 +1,5 @@
 """
-Advent of Code {year} - Day {day} - Part {part}
+Advent of Code 2025 - Day 9 - Part 2
 """
 
 from time import perf_counter
@@ -28,8 +28,8 @@ def main():
     result = solve(data)
     elapsed = perf_counter() - start
 
-    print(f"Result: {{{{result}}}}")
-    print(f"Time: {{{{elapsed:.6f}}}} seconds")
+    print(f"Result: {{result}}")
+    print(f"Time: {{elapsed:.6f}} seconds")
 
 
 if __name__ == "__main__":
