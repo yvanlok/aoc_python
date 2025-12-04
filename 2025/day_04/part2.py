@@ -1,5 +1,5 @@
 """
-Advent of Code 2025 - Day 4 - Part 1
+Advent of Code 2025 - Day 4 - Part 2
 """
 
 from time import perf_counter
@@ -11,43 +11,37 @@ def read_input(filename="data.txt"):
         return f.read().strip()
 
 
-def adjacent_rolls(grid, y, x):
-
-    count = 0
-
-    for j in range(y - 1, y + 2):
-        for i in range(x - 1, x + 2):
-            if j == y and i == x:
-                continue
-            if 0 <= j < len(grid) and 0 <= i < len(grid[0]):
-                if grid[j][i] == "@":
-                    count += 1
-    return count
+NEIGHBORS = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 
 
 def solve(data):
     """Solve the puzzle."""
     lines = data.split("\n")
-    grid = [list(line) for line in lines]
+
+    # Track rolls as a set for O(1) lookup
+    rolls = set()
+    for y, line in enumerate(lines):
+        for x, ch in enumerate(line):
+            if ch == "@":
+                rolls.add((y, x))
 
     result = 0
+    changed = True
 
-    finished = False
-
-    while not finished:
+    while changed:
+        changed = False
         to_remove = []
-        for y in range(len(grid)):
-            for x in range(len(grid[0])):
-                if grid[y][x] == "@":
-                    rolls = adjacent_rolls(grid, y, x)
-                    if rolls < 4:
-                        result += 1
-                        to_remove.append((y, x))
+
+        for y, x in rolls:
+            count = sum(1 for dy, dx in NEIGHBORS if (y + dy, x + dx) in rolls)
+            if count < 4:
+                to_remove.append((y, x))
+
         if to_remove:
-            for y, x in to_remove:
-                grid[y][x] = "X"
-        else:
-            finished = True
+            changed = True
+            result += len(to_remove)
+            for pos in to_remove:
+                rolls.discard(pos)
 
     return result
 
