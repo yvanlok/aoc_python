@@ -13,10 +13,26 @@ def read_input(filename="data.txt"):
 
 def solve(data):
     """Solve the puzzle."""
-    lines = data.split("\n")
+    # Split input into two sections: ranges and ingredient IDs
+    parts = [part.strip().split("\n") for part in data.split("\n\n")]
 
-    # TODO: Implement solution
-    result = None
+    ingredient_ranges = parts[0]
+    ingredient_ids = parts[1]
+
+    # Store ranges as (lower, upper) tuples for range checking
+    allowed_ranges = set()
+
+    result = 0
+
+    # Parse each range string into a tuple of integers
+    for ingredient_range in ingredient_ranges:
+        ids = ingredient_range.split("-")
+        allowed_ranges.add((int(ids[0]), int(ids[1])))
+
+    # Count how many ingredient IDs fall within any allowed range
+    for ingredient_id in ingredient_ids:
+        if any(lower <= int(ingredient_id) <= upper for lower, upper in allowed_ranges):
+            result += 1
 
     return result
 
