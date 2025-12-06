@@ -3,6 +3,7 @@ Advent of Code 2025 - Day 6 - Part 1
 """
 
 from time import perf_counter
+import math
 
 
 def read_input(filename="data.txt"):
@@ -15,8 +16,20 @@ def solve(data):
     """Solve the puzzle."""
     lines = data.split("\n")
 
-    # TODO: Implement solution
-    result = None
+    result = 0
+
+    numbers = []
+
+    operations = lines[-1].split()
+
+    for line in lines[:-1]:
+        numbers.append([int(num) for num in line.split()])
+
+    for idx in range(0, len(operations)):
+        if operations[idx] == "*":
+            result += math.prod([row[idx] for row in numbers])
+        else:
+            result += sum([row[idx] for row in numbers])
 
     return result
 
