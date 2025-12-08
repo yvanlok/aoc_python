@@ -15,10 +15,33 @@ def solve(data):
     """Solve the puzzle."""
     lines = data.split("\n")
 
-    # TODO: Implement solution
-    result = None
+    START = "S"
+    SPLITTER = "^"
 
-    return result
+    # Dictionary: {column: number_of_beams_at_that_column}
+    beams = {lines[0].index(START): 1}
+
+    splits = 0
+
+    for row in lines[1:]:
+        if SPLITTER not in row:
+            continue  # Skip rows with no splitters
+
+        # Snapshot the current beam state before modifying
+        current_beams = list(beams.items())
+
+        for col, count in current_beams:
+            if row[col] == SPLITTER:
+                splits += count  # Each beam at this position causes a split
+
+                # Remove the beam from this column
+                beams.pop(col)
+
+                # Add beams to left and right
+                beams[col - 1] = beams.get(col - 1, 0) + count
+                beams[col + 1] = beams.get(col + 1, 0) + count
+
+    return sum(beams.values())
 
 
 def main():
