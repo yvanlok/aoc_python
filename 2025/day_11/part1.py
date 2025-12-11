@@ -3,6 +3,7 @@ Advent of Code 2025 - Day 11 - Part 1
 """
 
 from time import perf_counter
+import networkx as nx
 
 
 def read_input(filename="data.txt"):
@@ -15,8 +16,17 @@ def solve(data):
     """Solve the puzzle."""
     lines = data.split("\n")
 
-    # TODO: Implement solution
-    result = None
+    G = nx.DiGraph()
+
+    result = 0
+
+    for line in lines:
+        parts = line.split(": ")
+        for edge in parts[1].split():
+            G.add_edge(parts[0], edge)
+
+    for path in nx.all_simple_paths(G, source="you", target="out"):
+        result += 1
 
     return result
 
