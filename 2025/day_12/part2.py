@@ -14,11 +14,9 @@ def read_input(filename="data.txt"):
 def solve(data):
     """Solve the puzzle."""
     lines = data.split("\n")
+    print("\u0336".join("Merry Christmas!"))
 
-    # TODO: Implement solution
-    result = None
-
-    return result
+    return None
 
 
 def main():
